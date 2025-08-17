@@ -25,41 +25,40 @@ const Register = () => {
     useRegisterMutation();
 
   // handling the form
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  if (password !== confirmPassword) {
-    toast.error("Passwords do not match");
-    return;
-  }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
 
-  register({
-    name,
-    email,
-    password,
-    confirmPassword,
-    rememberMe,
-  });
-};
+    register({
+      name,
+      email,
+      password,
+      confirmPassword,
+      rememberMe,
+    });
+  };
 
-// side effects after mutation
-useEffect(() => {
-  if (isSuccess) {
-    toast.success("Account created successfully");
-    resetForm();
-  }
+  // side effects after mutation
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Account created successfully");
+      resetForm();
+    }
 
-  if (isError) {
-    toast.error(error?.data || "Something went wrong");
-  }
-}, [isSuccess, isError, error]);
+    if (isError) {
+      toast.error(error?.data || "Something went wrong");
+    }
+  }, [isSuccess, isError, error]);
 
-useEffect(() => {
-  if (data?.accessToken && data?.user) {
-    navigate("/inbox");
-  }
-}, [data?.accessToken, data?.user, navigate]);
-
+  useEffect(() => {
+    if (data?.accessToken && data?.user) {
+      navigate("/inbox");
+    }
+  }, [data?.accessToken, data?.user, navigate]);
 
   return (
     <div className="grid place-items-center h-screen bg-[#F9FAFB">
@@ -151,11 +150,21 @@ useEffect(() => {
 
             <div>
               <button
-                disabled={isLoading}
                 type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md text-white bg-violet-600 hover:bg-violet-700"
+                disabled={isLoading}
+                className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white 
+                      ${
+                        isLoading
+                          ? "bg-violet-400 cursor-not-allowed"
+                          : "bg-violet-600 hover:bg-violet-700"
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500`}
               >
-                Sign up
+                {isLoading ? (
+                  <AiOutlineLoading3Quarters className="animate-spin h-5 w-5 text-white" />
+                ) : (
+                  "Sign Up"
+                )}
               </button>
             </div>
           </form>
