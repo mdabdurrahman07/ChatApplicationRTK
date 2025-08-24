@@ -4,6 +4,8 @@ import ChatItem from "./ChatItem";
 import toast from "react-hot-toast";
 import moment from "moment";
 import getPartnerInfo from "../../utils/getPartnerInfo";
+import gravatarUrl from "gravatar-url";
+import { Link } from "react-router-dom";
 
 export default function ChatItems() {
   const { user } = useSelector((state) => state.auth) || {};
@@ -25,15 +27,22 @@ export default function ChatItems() {
   } else {
     content = conversations.map((conversation) => {
       const { id, message, timestamp } = conversation;
-      const {name} = getPartnerInfo(conversation.users , email)
+      const { name, email: partnerEmail } = getPartnerInfo(
+        conversation.users,
+        email
+      );
       return (
         <li key={id}>
-          <ChatItem
-            avatar="https://cdn.pixabay.com/photo/2018/09/12/12/14/man-3672010__340.jpg"
-            name={name}
-            lastMessage={message}
-            lastTime={moment(timestamp).fromNow()}
-          />
+          <Link to={`/inbox/${id}`}>
+            <ChatItem
+              avatar={gravatarUrl(partnerEmail, {
+                size: 80,
+              })}
+              name={name}
+              lastMessage={message}
+              lastTime={moment(timestamp).fromNow()}
+            />
+          </Link>
         </li>
       );
     });
