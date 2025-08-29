@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 export default function ChatBody() {
     const {id} = useParams()
     const {data: messages , isError , isLoading, error} = useGetMessagesQuery(id)
+    console.log("checking from chatBody",messages)
     let content = null;
   if (isLoading) {
     content = <div className="m-2 text-center">Loading...</div>;
