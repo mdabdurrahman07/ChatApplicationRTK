@@ -23,7 +23,7 @@ export default function ChatItems() {
   } else if (!isLoading && isError) {
     content = toast.error(error);
   } else if (!isLoading && !isError && conversations.length === 0) {
-    content = toast.error("No conversation found");
+    content = toast.error("No Conversation Found")
   } else {
     content = conversations.map((conversation) => {
       const { id, message, timestamp } = conversation;

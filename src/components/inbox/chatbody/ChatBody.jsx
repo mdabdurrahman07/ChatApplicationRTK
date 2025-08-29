@@ -9,19 +9,18 @@ import toast from "react-hot-toast";
 export default function ChatBody() {
     const {id} = useParams()
     const {data: messages , isError , isLoading, error} = useGetMessagesQuery(id)
-    console.log("checking from chatBody",messages)
+    // console.log("checking from chatBody",messages)
     let content = null;
   if (isLoading) {
     content = <div className="m-2 text-center">Loading...</div>;
   } else if (!isLoading && isError) {
     content = toast.error(error);
   } else if (!isLoading && !isError && messages.length === 0) {
-    content = toast.error("No messages found");
+    content = <><p className="text-2xl text-center m-5 text-red-600 font-semibold">No messages found</p></>
   } else {
     content =  <>
      <ChatHead
-          avatar="https://cdn.pixabay.com/photo/2018/01/15/07/51/woman-3083383__340.jpg"
-          name="Akash Ahmed"
+          message={messages[0]}
         />
         <Messages messages={messages}/>
         <Options />
