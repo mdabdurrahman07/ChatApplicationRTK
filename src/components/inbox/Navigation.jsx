@@ -8,7 +8,7 @@ export default function Navigation() {
 
   const handleLogout = () => {
     dispatch(userLoggedOut());
-    localStorage.clear()
+    localStorage.clear();
   };
   return (
     <nav className="border-general sticky top-0 z-40 border-b bg-violet-700 transition-colors">
