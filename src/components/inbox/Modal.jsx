@@ -1,4 +1,35 @@
+import { useState } from "react";
+import isValidEmail from "../../utils/isValidEmail";
+import { useGetUsersQuery } from "../../redux/features/users/usersApi";
+import toast from "react-hot-toast";
+
 export default function Modal({ open, control }) {
+  const [to, setTo] = useState("");
+  const [message, setMessage] = useState("");
+  const [userCheck, setUserCheck] = useState(false);
+  // getting the user
+  const { data: participant } = useGetUsersQuery(to, {
+    skip: !userCheck,
+  });
+  // debounce handler
+  const debounceHandler = (fn, delay) => {
+    let timeOut;
+    return (...arg) => {
+      clearTimeout(timeOut);
+      timeOut = setTimeout(() => {
+        fn(...arg);
+      }, delay);
+    };
+  };
+  // debounce Search
+  const doSearch = (value) => {
+    if (isValidEmail(value)) {
+      setUserCheck(true);
+    }
+    setTo(value);
+  };
+  // from handler
+  const handleSearch = debounceHandler(doSearch, 500);
   return (
     open && (
       <>
@@ -12,7 +43,9 @@ export default function Modal({ open, control }) {
           </h2>
           <form className="mt-8 space-y-6" action="#" method="POST">
             <input type="hidden" name="remember" value="true" />
+            {/* email & messages input */}
             <div className="rounded-md shadow-sm -space-y-px">
+              {/* email input */}
               <div>
                 <label htmlFor="to" className="sr-only">
                   To
@@ -20,12 +53,14 @@ export default function Modal({ open, control }) {
                 <input
                   id="to"
                   name="to"
-                  type="to"
+                  type="email"
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
                   placeholder="Send to"
+                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
+              {/* messages input */}
               <div>
                 <label htmlFor="message" className="sr-only">
                   Message
@@ -33,14 +68,16 @@ export default function Modal({ open, control }) {
                 <textarea
                   id="message"
                   name="message"
-                  type="message"
+                  type="text"
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
                   placeholder="Message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                 />
               </div>
             </div>
-
+            {/* button */}
             <div>
               <button
                 type="submit"
@@ -50,7 +87,8 @@ export default function Modal({ open, control }) {
               </button>
             </div>
 
-            {/* <Error message="There was an error" /> */}
+            {participant?.length === 0 &&
+              toast.error("This user doesn't exits")}
           </form>
         </div>
       </>
