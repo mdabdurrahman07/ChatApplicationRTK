@@ -1,16 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import isValidEmail from "../../utils/isValidEmail";
 import { useGetUsersQuery } from "../../redux/features/users/usersApi";
 import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { conversationApi } from "../../redux/features/conversation/conversationApi";
 
 export default function Modal({ open, control }) {
+  const dispatch = useDispatch();
   const [to, setTo] = useState("");
   const [message, setMessage] = useState("");
   const [userCheck, setUserCheck] = useState(false);
+  const { user: loggedInUser } = useSelector((state) => state.auth) || {};
+  const { email: myEmail } = loggedInUser || {};
+  const [conversation, setConversation] = useState(undefined);
+
   // getting the user
   const { data: participant } = useGetUsersQuery(to, {
     skip: !userCheck,
   });
+
+  useEffect(() => {
+    // check conversation existence
+    if (participant?.length > 0 && participant[0].email !== myEmail) {
+      dispatch(
+        conversationApi.endpoints.getConversation.initiate({
+          userEmail: myEmail,
+          participantEmail: to,
+        })
+      )
+        .unwrap()
+        .then((data) => {
+          setConversation(data);
+        })
+        .catch((err) => toast.error(err.message));
+    }
+  }, [dispatch, myEmail, participant, to]);
   // debounce handler
   const debounceHandler = (fn, delay) => {
     let timeOut;
@@ -30,6 +54,10 @@ export default function Modal({ open, control }) {
   };
   // from handler
   const handleSearch = debounceHandler(doSearch, 500);
+  const handleNewConversation = (e) => {
+    e.preventDefault()
+    console.log("convo check");
+  };
   return (
     open && (
       <>
@@ -41,7 +69,7 @@ export default function Modal({ open, control }) {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Send message
           </h2>
-          <form className="mt-8 space-y-6" action="#" method="POST">
+          <form className="mt-8 space-y-6" onSubmit={handleNewConversation}>
             <input type="hidden" name="remember" value="true" />
             {/* email & messages input */}
             <div className="rounded-md shadow-sm -space-y-px">
@@ -82,6 +110,10 @@ export default function Modal({ open, control }) {
               <button
                 type="submit"
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                disabled={
+                  conversation === undefined ||
+                  (participant?.length > 0 && participant[0].email === myEmail)
+                }
               >
                 Send Message
               </button>
@@ -89,6 +121,9 @@ export default function Modal({ open, control }) {
 
             {participant?.length === 0 &&
               toast.error("This user doesn't exits")}
+            {participant?.length > 0 &&
+              participant[0].email === myEmail &&
+              toast.error("You can't send message to yourself")}
           </form>
         </div>
       </>
