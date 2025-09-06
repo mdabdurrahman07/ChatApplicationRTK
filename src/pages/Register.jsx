@@ -3,6 +3,7 @@ import logoImage from "../assets/lws-logo-light.svg";
 import { useEffect, useState } from "react";
 import { useRegisterMutation } from "../redux/features/auth/authApi";
 import toast from "react-hot-toast";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ const Register = () => {
     setRememberMe(false);
   };
   // apiCalling from RTK
-  const [register, { data, isError, error, isLoading, isSuccess }] =
+  const [register, { data = [], isError, error, isLoading, isSuccess }] =
     useRegisterMutation();
 
   // handling the form

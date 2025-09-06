@@ -6,46 +6,58 @@ import moment from "moment";
 import getPartnerInfo from "../../utils/getPartnerInfo";
 import gravatarUrl from "gravatar-url";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function ChatItems() {
   const { user } = useSelector((state) => state.auth) || {};
   const { email } = user || {};
-  //   what to render
+
   const {
-    data: conversations,
+    data: conversations = [],
     isError,
     error,
     isLoading,
-  } = useGetConversationsQuery(email);
-  let content = null;
+  } = useGetConversationsQuery(email, { skip: !email });
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(error?.data || "Failed to load conversations");
+    }
+    if (!isError && !isLoading && conversations.length === 0) {
+      toast.error("No conversations found");
+    }
+  }, [isError, error, isLoading, conversations.length]);
+
   if (isLoading) {
-    content = <li className="m-2 text-center">Loading...</li>;
-  } else if (!isLoading && isError) {
-    content = toast.error(error);
-  } else if (!isLoading && !isError && conversations.length === 0) {
-    content = toast.error("No Conversation Found")
-  } else {
-    content = conversations.map((conversation) => {
-      const { id, message, timestamp } = conversation;
-      const { name, email: partnerEmail } = getPartnerInfo(
-        conversation.users,
-        email
-      );
-      return (
-        <li key={id}>
-          <Link to={`/inbox/${id}`}>
-            <ChatItem
-              avatar={gravatarUrl(partnerEmail, {
-                size: 80,
-              })}
-              name={name}
-              lastMessage={message}
-              lastTime={moment(timestamp).fromNow()}
-            />
-          </Link>
-        </li>
-      );
-    });
+    return <li className="m-2 text-center">Loading...</li>;
   }
-  return <ul>{content}</ul>;
+
+  if (!isLoading && conversations.length === 0) {
+    return <li className="m-2 text-center">No conversations yet</li>;
+  }
+
+  return (
+    <ul>
+      {conversations.map((conversation) => {
+        const { id, message, timestamp } = conversation;
+        const { name, email: partnerEmail } = getPartnerInfo(
+          conversation.users,
+          email
+        );
+        return (
+          <li key={id}>
+            <Link to={`/inbox/${id}`}>
+              <ChatItem
+                avatar={gravatarUrl(partnerEmail, { size: 80 })}
+                name={name}
+                lastMessage={message}
+                lastTime={moment(timestamp).fromNow()}
+              />
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
+
