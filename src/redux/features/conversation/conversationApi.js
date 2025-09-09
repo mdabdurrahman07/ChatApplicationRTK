@@ -19,7 +19,7 @@ export const conversationApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
-        if (conversationApi?.id) {
+        if (conversation?.data?.id) {
           // silent entry to message table
           const users = arg?.data?.users;
           const senderUser = users.find((user) => user.email === arg?.sender);
@@ -44,7 +44,7 @@ export const conversationApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
-        if (conversationApi?.id) {
+        if (conversation?.data?.id) {
           // silent entry to message table
           const users = arg?.data?.users;
           const senderUser = users.find((user) => user.email === arg?.sender);
