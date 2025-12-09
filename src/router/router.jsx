@@ -5,13 +5,29 @@ import Register from "../pages/Register";
 import Conversation from "../pages/Conversation";
 import Inbox from "../pages/Inbox";
 import { PrivateRoute } from "../components/PrivateRoute/PrivateRoute.jsx";
+import PublicRoute from "../components/PublicRoute/PublicRoute.jsx";
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     children: [
-      { path: "/", element: <Login /> },
-      { path: "/register", element: <Register /> },
+      {
+        path: "/",
+        element: (
+          <PublicRoute>
+            {" "}
+            <Login />{" "}
+          </PublicRoute>
+        ),
+      },
+      {
+        path: "/register",
+        element: (
+          <PublicRoute>
+            <Register />{" "}
+          </PublicRoute>
+        ),
+      },
       {
         path: "/inbox",
         element: (
