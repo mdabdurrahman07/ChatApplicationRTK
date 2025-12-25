@@ -54,10 +54,10 @@ export default function Modal({ open, control }) {
   // debounce handler
   const debounceHandler = (fn, delay) => {
     let timeOut;
-    return (...arg) => {
+    return (...args) => {
       clearTimeout(timeOut);
       timeOut = setTimeout(() => {
-        fn(...arg);
+        fn(...args);
       }, delay);
     };
   };
